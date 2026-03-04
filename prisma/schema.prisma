@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model EventState {
+  id             Int      @id @default(autoincrement())
+  durationMinutes Float   @default(30.0)
+  startTime      DateTime?
+  isStarted      Boolean  @default(false)
+  isExploded     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Group {
+  id        String   @id
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  defusalRecords DefusalRecord[]
+}
+
+model DefusalRecord {
+  id               String   @id @default(cuid())
+  groupId          String
+  timeTakenSeconds Float
+  defusedAt        DateTime @default(now())
+  createdAt        DateTime @default(now())
+  
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  
+  @@unique([groupId, timeTakenSeconds])
+}
