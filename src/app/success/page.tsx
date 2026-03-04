@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import TimerDisplay from '@/components/TimerDisplay'
 
-export default function SuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams()
   const groupName = searchParams.get('group') || 'UNKNOWN'
   const timeTaken = searchParams.get('time') || '0.0000'
@@ -126,5 +126,13 @@ export default function SuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black text-green-400 flex items-center justify-center font-mono">LOADING...</div>}>
+      <SuccessContent />
+    </Suspense>
   )
 }
