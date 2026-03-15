@@ -75,6 +75,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(updatedState)
     }
 
+    if (action === 'reset-timer') {
+      // Only reset timer, do NOT clear defusal records
+      const updatedState = await prisma.eventState.update({
+        where: { id: eventState.id },
+        data: {
+          isStarted: false,
+          startTime: null,
+          isExploded: false
+        }
+      })
+      return NextResponse.json(updatedState)
+    }
+
     if (action === 'check-explosion') {
       if (!eventState.isStarted || eventState.isExploded) {
         return NextResponse.json(eventState)
