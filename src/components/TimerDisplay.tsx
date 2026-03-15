@@ -37,8 +37,9 @@ export default function TimerDisplay({ className = '' }: TimerDisplayProps) {
 
             const minutes = Math.floor(remaining / 60)
             const seconds = Math.floor(remaining % 60)
+            const milliseconds = Math.floor((remaining % 1) * 1000)
             
-            const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+            const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`
             setTimeRemaining(formattedTime)
 
             if (remaining <= 0 && !state.isExploded) {
@@ -64,15 +65,16 @@ export default function TimerDisplay({ className = '' }: TimerDisplayProps) {
     }
 
     fetchTimerState()
-    const interval = setInterval(fetchTimerState, 500)
+    const interval = setInterval(fetchTimerState, 100)
 
     return () => clearInterval(interval)
   }, [])
 
   const isLowTime = isStarted && !isExploded && timeRemaining !== 'SYSTEM ARMED' && timeRemaining !== 'EXPLODED' && 
     (() => {
-      const [minutes, seconds] = timeRemaining.split(':')
-      const totalMinutes = parseInt(minutes) + parseFloat(seconds) / 60
+      const [minutes, secondsWithMs] = timeRemaining.split(':')
+      const [seconds] = secondsWithMs.split('.')
+      const totalMinutes = parseInt(minutes) + parseInt(seconds) / 60
       return totalMinutes < 5
     })()
 
