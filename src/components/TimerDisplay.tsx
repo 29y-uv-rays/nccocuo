@@ -53,6 +53,9 @@ export default function TimerDisplay({ className = '' }: TimerDisplayProps) {
             setTimeRemaining('SYSTEM ARMED')
           } else if (state.isExploded) {
             setTimeRemaining('EXPLODED')
+          } else if (state.isStarted && state.startTime === null) {
+            // Timer was reset but isStarted flag is still true
+            setTimeRemaining('SYSTEM ARMED')
           }
         }
       } catch (error) {
