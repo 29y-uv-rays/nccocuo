@@ -217,6 +217,36 @@ export default function AdminPage() {
     }
   }
 
+  const handleResetTimer = async () => {
+    if (!confirm('RESET TIMER TO 0? THIS WILL NOT AFFECT DEFUSAL RECORDS OR LEADERBOARD.')) return
+
+    setIsResetting(true)
+    try {
+      const response = await fetch('/api/timer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'reset-timer' })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setEventState(data)
+        setMessage('TIMER RESET')
+      } else {
+        setMessage(data.error || 'FAILED TO RESET TIMER')
+      }
+    } catch (error) {
+      console.error('Error resetting timer:', error)
+      setMessage('SYSTEM ERROR')
+    } finally {
+      setIsResetting(false)
+      setTimeout(() => setMessage(''), 3000)
+    }
+  }
+
   const handleResetSystem = async () => {
     if (!confirm('RESET THE ENTIRE SYSTEM? THIS WILL CLEAR ALL DEFUSAL RECORDS.')) return
 
@@ -393,9 +423,18 @@ export default function AdminPage() {
                   )}
 
                   {eventState?.isStarted && (
-                    <div className="text-center font-mono text-yellow-400 p-2 border border-yellow-400">
-                      TIMER ACTIVE - CONTROLS LOCKED
-                    </div>
+                    <>
+                      <button
+                        onClick={handleResetTimer}
+                        disabled={isResetting}
+                        className="w-full bg-yellow-900 hover:bg-yellow-800 disabled:bg-yellow-950 disabled:text-yellow-700 text-yellow-400 font-mono px-4 py-2 border-2 border-yellow-400 disabled:border-yellow-800 transition-colors mb-2"
+                      >
+                        {isResetting ? 'RESETTING TIMER...' : 'RESET TIMER'}
+                      </button>
+                      <div className="text-center font-mono text-yellow-400 p-2 border border-yellow-400">
+                        TIMER ACTIVE - CONTROLS LOCKED (reset only resets time)
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
